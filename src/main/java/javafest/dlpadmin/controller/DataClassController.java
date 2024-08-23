@@ -56,9 +56,18 @@ public class DataClassController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity<>(ruleService.save(rule), HttpStatus.CREATED);  
+        return new ResponseEntity<>(ruleService.save(rule), HttpStatus.CREATED);
     }
-    
-    
+
+    @GetMapping("/copy-default")
+    public ResponseEntity<Void> setDefault(@RequestParam String userId) {
+        String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!authenticatedUserId.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        dataClassService.copyDefaultDataClassesToUser(userId);
+        return ResponseEntity.ok().build();
+    }
 
 }
