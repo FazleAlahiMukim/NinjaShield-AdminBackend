@@ -33,6 +33,10 @@ public class UserService {
         return null;
     }
 
+    public boolean authenticateUser(String userId, String email) {
+        return userRepository.existsByUserIdAndEmail(userId, email);
+    }
+
     public List<UserDto> findAll() {
         return userRepository.findAll().stream().map(this::toDto).toList();
     }

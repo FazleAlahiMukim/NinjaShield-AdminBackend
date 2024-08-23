@@ -23,7 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider jwtTokenProvider;
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-    private final List<String> excludedPaths = List.of("/api/user/login", "/api/user/register");
+    private final List<String> excludedPaths = List.of("/api/user/login", "/api/user/register", "/api/device/register");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

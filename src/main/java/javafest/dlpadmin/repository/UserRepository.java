@@ -9,4 +9,5 @@ import javafest.dlpadmin.model.User;
 public interface UserRepository extends MongoRepository<User, String> {
 
     Optional<User> findByEmail(String email);
+    boolean existsByUserIdAndEmail(String userId, String email);
 }
