@@ -3,10 +3,13 @@ package javafest.dlpadmin.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javafest.dlpadmin.dto.DataClassAndRules;
+import javafest.dlpadmin.dto.RuleDto;
 import javafest.dlpadmin.model.DataClass;
 import javafest.dlpadmin.model.DefaultDataClass;
 import javafest.dlpadmin.model.Rule;
@@ -26,12 +29,25 @@ public class DataClassService {
     @Autowired
     private RuleRepository ruleRepository;
 
+    private ModelMapper modelMapper = new ModelMapper();
+
     public List<DataClass> findByUserId(String userId) {
         return dataClassRepository.findByUserId(userId);
     }
 
     public DataClass save(DataClass dataClass) {
         return dataClassRepository.save(dataClass);
+    }
+
+    public void saveDataClassAndRules(DataClassAndRules dataClassAndRules) {
+        DataClass dataClass = toDataClass(dataClassAndRules);
+        List<Rule> rules = toRules(dataClassAndRules);
+
+        DataClass returnedDataClass = dataClassRepository.save(dataClass);
+        for (Rule rule : rules) {
+            rule.setDataId(returnedDataClass.getDataId());
+        }
+        ruleRepository.saveAll(rules);
     }
 
     public boolean validateUserAndDataId(String userId, String dataId) {
@@ -70,4 +86,15 @@ public class DataClassService {
         ruleRepository.saveAll(newRules);
     }
 
+    private DataClass toDataClass(DataClassAndRules dataClassAndRules) {
+        return modelMapper.map(dataClassAndRules, DataClass.class);
+    }
+
+    private List<Rule> toRules(DataClassAndRules dataClassAndRules) {
+        List<Rule> rules = new ArrayList<>();
+        for (RuleDto rule : dataClassAndRules.getRules()) {
+            rules.add(modelMapper.map(rule, Rule.class));
+        }
+        return rules;
+    }
 }

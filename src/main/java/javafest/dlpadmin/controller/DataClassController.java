@@ -2,6 +2,7 @@ package javafest.dlpadmin.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import javafest.dlpadmin.dto.DataClassAndRules;
 import javafest.dlpadmin.model.DataClass;
 import javafest.dlpadmin.model.Rule;
 import javafest.dlpadmin.service.DataClassService;
@@ -47,6 +48,17 @@ public class DataClassController {
         }
 
         return new ResponseEntity<>(dataClassService.save(dataClass), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<Void> saveDataClassAndRules(@RequestBody DataClassAndRules dataClassAndRules) {
+        String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!authenticatedUserId.equals(dataClassAndRules.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        dataClassService.saveDataClassAndRules(dataClassAndRules);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/rule")
