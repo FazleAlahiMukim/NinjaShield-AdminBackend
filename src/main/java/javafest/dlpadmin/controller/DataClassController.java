@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,6 +60,17 @@ public class DataClassController {
         dataClassService.saveDataClassAndRules(dataClassAndRules);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestParam String userId, @RequestParam String dataId) {
+        String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!dataClassService.validateUserAndDataId(authenticatedUserId, dataId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        dataClassService.delete(dataId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/rule")

@@ -50,6 +50,11 @@ public class DataClassService {
         ruleRepository.saveAll(rules);
     }
 
+    public void delete(String dataId) {
+        dataClassRepository.deleteById(dataId);
+        ruleRepository.deleteByDataId(dataId);
+    }
+
     public boolean validateUserAndDataId(String userId, String dataId) {
         return dataClassRepository.existsByUserIdAndDataId(userId, dataId);
     }
