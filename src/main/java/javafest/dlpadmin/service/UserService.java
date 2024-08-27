@@ -37,10 +37,6 @@ public class UserService {
         return userRepository.existsByUserIdAndEmail(userId, email);
     }
 
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream().map(this::toDto).toList();
-    }
-
     public UserDto register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return toDto(userRepository.save(user));
