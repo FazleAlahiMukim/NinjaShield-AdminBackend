@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javafest.dlpadmin.model.Device;
 import javafest.dlpadmin.service.DeviceService;
-import javafest.dlpadmin.service.UserService;
+import javafest.dlpadmin.service.AuthService;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/api/device")
 public class DeviceController {
     private final DeviceService deviceService;
-    private final UserService userService;
+    private final AuthService authService;
 
     @GetMapping
     public ResponseEntity<List<Device>> findByUserId(@RequestParam String userId) {
@@ -39,7 +39,7 @@ public class DeviceController {
     @GetMapping("/requests")
     public ResponseEntity<List<Device>> requests(@RequestParam String userId, @RequestParam String email) {
         String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!authenticatedUserId.equals(userId) || !userService.authenticateUser(userId, email)) {
+        if (!authenticatedUserId.equals(userId) || !authService.authenticateUser(userId, email)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -55,13 +55,11 @@ public class DeviceController {
 
         return new ResponseEntity<>(deviceService.save(device), HttpStatus.OK);
     }
-    
 
     @PostMapping("/register")
     public ResponseEntity<Device> register(@RequestBody Device device) {
         return new ResponseEntity<>(deviceService.save(device), HttpStatus.CREATED);
     }
-    
 
     @PostMapping
     public ResponseEntity<Device> save(@RequestBody Device device) {

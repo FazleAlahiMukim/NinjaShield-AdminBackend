@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Component
@@ -56,5 +57,14 @@ public class JwtTokenProvider {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public Instant getExpiryInstantFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getExpiration().toInstant();
     }
 }

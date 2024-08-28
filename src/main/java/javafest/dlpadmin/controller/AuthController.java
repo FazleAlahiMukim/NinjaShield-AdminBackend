@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletResponse;
 import javafest.dlpadmin.dto.LoginRequest;
 import javafest.dlpadmin.dto.UserDto;
-import javafest.dlpadmin.service.UserService;
+import javafest.dlpadmin.service.AuthService;
 import javafest.dlpadmin.util.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 
@@ -20,18 +20,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/user")
-public class UserController {
-    private final UserService userService;
+@RequestMapping("/api/auth")
+public class AuthController {
+    private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        UserDto userDto = userService.authenticateUser(loginRequest);
+        UserDto userDto = authService.authenticateUser(loginRequest);
 
         if (userDto != null) {
             String accessToken = jwtTokenProvider.createAccessToken(userDto.getUserId());
             String refreshToken = jwtTokenProvider.createRefreshToken(userDto.getUserId());
+
+            authService.saveRefreshToken(refreshToken, userDto.getUserId());
 
             ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
                     .httpOnly(true)
@@ -50,39 +52,36 @@ public class UserController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@CookieValue(name = "refreshToken") String refreshToken) {
-        if (jwtTokenProvider.validateToken(refreshToken)) {
-            String userId = jwtTokenProvider.getIdFromToken(refreshToken);
-            String newAccessToken = jwtTokenProvider.createAccessToken(userId);
-            return ResponseEntity.ok(newAccessToken);
-        } else {
+    public ResponseEntity<String> refreshToken(@CookieValue String refreshToken) {
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
         }
+
+        String newAccessToken = authService.createAccessTokenFromRefreshToken(refreshToken);
+        if (newAccessToken != null) {
+            return ResponseEntity.ok(newAccessToken);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        ResponseCookie clearCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(0)
-                .sameSite("Strict")
-                .build();
-        response.addHeader("Set-Cookie", clearCookie.toString());
+    public ResponseEntity<?> logout(@CookieValue String refreshToken, HttpServletResponse response) {
+        authService.invalidateRefreshToken(refreshToken);
+        response.addHeader("Set-Cookie", ResponseCookie.from("refreshToken", "").path("/").maxAge(0).build().toString());
         return ResponseEntity.ok("Logged out successfully");
     }
 
     // @PostMapping("/register")
     // public ResponseEntity<UserDto> register(@RequestBody User user) {
-    //     UserDto userDto = userService.register(user);
-    //     if (userDto != null) {
-    //         String token = jwtTokenProvider.createToken(userDto.getUserId());
-    //         userDto.setToken(token);
-    //         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
-    //     } else {
-    //         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-    //     }
+    // UserDto userDto = authService.register(user);
+    // if (userDto != null) {
+    // String token = jwtTokenProvider.createToken(userDto.getUserId());
+    // userDto.setToken(token);
+    // return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+    // } else {
+    // return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    // }
     // }
 
 }

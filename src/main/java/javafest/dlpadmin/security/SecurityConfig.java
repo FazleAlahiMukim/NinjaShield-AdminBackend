@@ -25,7 +25,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configure CORS properly
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/user/login", "/api/user/register", "/api/user/refresh-token", "/api/device/register").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh-token", "/api/device/register").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

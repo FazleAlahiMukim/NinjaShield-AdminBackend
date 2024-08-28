@@ -24,9 +24,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludedPaths = List.of(
-            "/api/user/login",
-            "/api/user/register",
-            "/api/user/refresh-token",
+            "/api/auth/login",
+            "/api/auth/register",
+            "/api/auth/refresh-token",
             "/api/device/register");
 
     @Override

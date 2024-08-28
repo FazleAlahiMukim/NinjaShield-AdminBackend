@@ -1,5 +1,7 @@
 package javafest.dlpadmin.service;
 
+import java.time.Instant;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -7,19 +9,20 @@ import org.springframework.stereotype.Service;
 
 import javafest.dlpadmin.dto.LoginRequest;
 import javafest.dlpadmin.dto.UserDto;
+import javafest.dlpadmin.model.RefreshToken;
 import javafest.dlpadmin.model.User;
+import javafest.dlpadmin.repository.RefreshTokenRepository;
 import javafest.dlpadmin.repository.UserRepository;
+import javafest.dlpadmin.util.JwtTokenProvider;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @Service
-public class UserService {
-
-    @Autowired
+public class AuthService {
     private UserRepository userRepository;
-
-    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+    private JwtTokenProvider jwtTokenProvider;
     private PasswordEncoder passwordEncoder;
-
-    private ModelMapper modelMapper = new ModelMapper();
 
     public UserDto authenticateUser(LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
@@ -35,12 +38,29 @@ public class UserService {
         return userRepository.existsByUserIdAndEmail(userId, email);
     }
 
+    public String createAccessTokenFromRefreshToken(String refreshToken) {
+        return refreshTokenRepository.findByToken(refreshToken)
+                .filter(token -> !token.getExpiryDate().isBefore(Instant.now()))
+                .map(token -> jwtTokenProvider.createAccessToken(token.getUserId()))
+                .orElse(null);
+    }
+
+    public void saveRefreshToken(String refreshToken, String userId) {
+        Instant expiryDate = jwtTokenProvider.getExpiryInstantFromToken(refreshToken);
+        refreshTokenRepository.save(new RefreshToken(userId, refreshToken, expiryDate));
+    }
+
+    public void invalidateRefreshToken(String refreshToken) {
+        refreshTokenRepository.deleteByToken(refreshToken);
+    }
+
     public UserDto register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return toDto(userRepository.save(user));
     }
 
     private UserDto toDto(User user) {
+        ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(user, UserDto.class);
     }
 }
