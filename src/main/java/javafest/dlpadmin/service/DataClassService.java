@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,20 +15,14 @@ import javafest.dlpadmin.model.Rule;
 import javafest.dlpadmin.repository.DataClassRepository;
 import javafest.dlpadmin.repository.DefaultDataClassRepository;
 import javafest.dlpadmin.repository.RuleRepository;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @Service
 public class DataClassService {
-
-    @Autowired
     private DataClassRepository dataClassRepository;
-
-    @Autowired
     private DefaultDataClassRepository defaultDataClassRepository;
-
-    @Autowired
     private RuleRepository ruleRepository;
-
-    private ModelMapper modelMapper = new ModelMapper();
 
     public List<DataClass> findByUserId(String userId) {
         return dataClassRepository.findByUserId(userId);
@@ -92,10 +85,12 @@ public class DataClassService {
     }
 
     private DataClass toDataClass(DataClassAndRules dataClassAndRules) {
+        ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(dataClassAndRules, DataClass.class);
     }
 
     private List<Rule> toRules(DataClassAndRules dataClassAndRules) {
+        ModelMapper modelMapper = new ModelMapper();
         List<Rule> rules = new ArrayList<>();
         for (RuleDto rule : dataClassAndRules.getRules()) {
             rules.add(modelMapper.map(rule, Rule.class));
