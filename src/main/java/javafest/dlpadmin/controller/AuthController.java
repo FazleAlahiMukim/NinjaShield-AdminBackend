@@ -35,14 +35,18 @@ public class AuthController {
 
             authService.saveRefreshToken(refreshToken, userDto.getUserId());
 
-            ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+            ResponseCookie.ResponseCookieBuilder refreshTokenCookieBuilder = ResponseCookie
+                    .from("refreshToken", refreshToken)
                     .httpOnly(true)
                     .secure(true)
                     .path("/")
-                    .maxAge(7 * 24 * 60 * 60)
-                    .sameSite("Strict")
-                    .build();
-            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+                    .sameSite("Strict");
+
+            if (loginRequest.isRememberMe()) {
+                refreshTokenCookieBuilder.maxAge(7 * 24 * 60 * 60); // 7 days
+            }
+
+            response.addHeader("Set-Cookie", refreshTokenCookieBuilder.build().toString());
 
             userDto.setToken(accessToken);
             return new ResponseEntity<>(userDto, HttpStatus.OK);
@@ -68,7 +72,8 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue String refreshToken, HttpServletResponse response) {
         authService.invalidateRefreshToken(refreshToken);
-        response.addHeader("Set-Cookie", ResponseCookie.from("refreshToken", "").path("/").maxAge(0).build().toString());
+        response.addHeader("Set-Cookie",
+                ResponseCookie.from("refreshToken", "").path("/").maxAge(0).build().toString());
         return ResponseEntity.ok("Logged out successfully");
     }
 
