@@ -32,7 +32,7 @@ public class DataClassService {
         return dataClassRepository.save(dataClass);
     }
 
-    public void saveDataClassAndRules(DataClassAndRules dataClassAndRules) {
+    public DataClass saveDataClassAndRules(DataClassAndRules dataClassAndRules) {
         DataClass dataClass = toDataClass(dataClassAndRules);
         List<Rule> rules = toRules(dataClassAndRules);
 
@@ -41,6 +41,7 @@ public class DataClassService {
             rule.setDataId(returnedDataClass.getDataId());
         }
         ruleRepository.saveAll(rules);
+        return returnedDataClass;
     }
 
     public void delete(String dataId) {

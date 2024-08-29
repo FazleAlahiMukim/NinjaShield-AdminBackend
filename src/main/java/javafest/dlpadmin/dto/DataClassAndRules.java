@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class DataClassAndRules {
+    private String dataId;
     private String userId;
     @JsonProperty("isActive")
     private boolean isActive;

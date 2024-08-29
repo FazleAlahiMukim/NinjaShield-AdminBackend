@@ -50,18 +50,18 @@ public class DataClassController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Void> saveDataClassAndRules(@RequestBody DataClassAndRules dataClassAndRules) {
+    public ResponseEntity<DataClass> saveDataClassAndRules(@RequestBody DataClassAndRules dataClassAndRules) {
         String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!authenticatedUserId.equals(dataClassAndRules.getUserId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        dataClassService.saveDataClassAndRules(dataClassAndRules);
+        DataClass dataClass = dataClassService.saveDataClassAndRules(dataClassAndRules);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(dataClass, HttpStatus.CREATED);
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> delete(@RequestParam String userId, @RequestParam String dataId) {
+    public ResponseEntity<Void> delete(@RequestParam String dataId) {
         String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!dataClassService.validateUserAndDataId(authenticatedUserId, dataId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
