@@ -71,14 +71,14 @@ public class DataClassController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/rule")
-    public ResponseEntity<Rule> saveRule(@RequestBody Rule rule) {
+    @GetMapping("/rules")
+    public ResponseEntity<List<Rule>> getRules(@RequestParam String dataId) {
         String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!dataClassService.validateUserAndDataId(authenticatedUserId, rule.getDataId())) {
+        if (!dataClassService.validateUserAndDataId(authenticatedUserId, dataId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-
-        return new ResponseEntity<>(ruleService.save(rule), HttpStatus.CREATED);
+        List<Rule> rules =  ruleService.findByDataId(dataId);
+        return new ResponseEntity<>(rules, HttpStatus.OK);
     }
 
     @GetMapping("/copy-default")

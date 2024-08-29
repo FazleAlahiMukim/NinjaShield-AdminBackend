@@ -36,6 +36,10 @@ public class DataClassService {
         DataClass dataClass = toDataClass(dataClassAndRules);
         List<Rule> rules = toRules(dataClassAndRules);
 
+        if (dataClassAndRules.getDataId() != null) {
+            ruleRepository.deleteByDataId(dataClassAndRules.getDataId());
+        }
+
         DataClass returnedDataClass = dataClassRepository.save(dataClass);
         for (Rule rule : rules) {
             rule.setDataId(returnedDataClass.getDataId());

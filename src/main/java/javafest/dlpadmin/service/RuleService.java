@@ -16,9 +16,4 @@ public class RuleService {
     public List<Rule> findByDataId(String dataId) {
         return ruleRepository.findByDataId(dataId);
     }
-
-    public Rule save(Rule rule) {
-        return ruleRepository.save(rule);
-    }
-
 }
