@@ -1,30 +1,9 @@
-FROM maven:3.8.4-eclipse-temurin-21
-
-
-
+FROM maven:3.8.4-eclipse-temurin-21 as builder
 WORKDIR /app
+COPY . /app
+RUN mvn clean package
 
-
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-
-COPY src ./src
-
-
-RUN mvn clean install -DskipTests
-
-
-FROM eclipse-temurin:21-jdk-alpine
-
-
-WORKDIR /app
-
-
-COPY --from=build /app/target/*.jar app.jar
-
-
-EXPOSE 8080
-
-
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+FROM eclipse-temurin:21
+WORKDIR /opt/app
+COPY --from=builder /app/target/my-app.jar /opt/app/my-app.jar
+CMD ["java", "-jar", "/opt/app/my-app.jar"]
