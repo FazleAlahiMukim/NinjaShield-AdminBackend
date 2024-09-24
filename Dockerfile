@@ -1,4 +1,5 @@
-FROM maven:3.8.4-eclipse-temurin-21-alpine AS build
+FROM maven:3.8.4-eclipse-temurin-21
+
 
 
 WORKDIR /app
