@@ -37,6 +37,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("https://ninjashield.vercel.app/");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
