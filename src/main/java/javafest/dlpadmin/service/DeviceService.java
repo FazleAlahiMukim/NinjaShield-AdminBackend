@@ -13,6 +13,10 @@ import lombok.AllArgsConstructor;
 public class DeviceService {
     private DeviceRepository deviceRepository;
 
+    public String findById(String deviceId) {
+        return deviceRepository.findById(deviceId).get().getUserId();
+    }
+
     public List<Device> findByUserId(String userId) {
         return deviceRepository.findByUserId(userId);
     }

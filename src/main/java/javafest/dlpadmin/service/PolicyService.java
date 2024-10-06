@@ -24,6 +24,10 @@ public class PolicyService {
         return policyRepository.findByUserId(userId);
     }
 
+    public List<Policy> findByUserIdAndIsActiveTrue(String userId) {
+        return policyRepository.findByUserIdAndIsActiveTrue(userId);
+    }
+
     public Policy save(Policy policy) {
         return policyRepository.save(policy);
     }
