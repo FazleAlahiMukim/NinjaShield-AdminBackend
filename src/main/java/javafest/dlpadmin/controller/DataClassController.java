@@ -39,6 +39,16 @@ public class DataClassController {
         return new ResponseEntity<>(dataClassService.findByUserId(userId), HttpStatus.OK);
     }
 
+    @GetMapping("/actives")
+    public ResponseEntity<List<DataClass>> findByUserIdAndIsActive(@RequestParam String userId) {
+        String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!authenticatedUserId.equals(userId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(dataClassService.findByUserIdAndIsActive(userId), HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<DataClass> save(@RequestBody DataClass dataClass) {
         String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

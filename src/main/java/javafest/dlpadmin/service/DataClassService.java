@@ -28,6 +28,10 @@ public class DataClassService {
         return dataClassRepository.findByUserId(userId);
     }
 
+    public List<DataClass> findByUserIdAndIsActive(String userId) {
+        return dataClassRepository.findByUserIdAndIsActiveTrue(userId);
+    }
+
     public DataClass save(DataClass dataClass) {
         return dataClassRepository.save(dataClass);
     }

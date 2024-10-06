@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "openai.api.key",
+    "type": "java.lang.String",
+    "description": "your openai api key"
+  },
+  {
+    "name": "jwt.secret",
+    "type": "java.lang.String",
+    "description": "your jwt secret key"
+  },
+  {
+    "name": "jwt.accessExpiration",
+    "type": "java.lang.String",
+    "description": "the expiration time of the jwt access token"
+  },
+  {
+    "name": "jwt.refreshExpiration",
+    "type": "java.lang.String",
+    "description": "the expiration time of the jwt refresh token"
+  }
+]}
