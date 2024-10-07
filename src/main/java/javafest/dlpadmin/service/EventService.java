@@ -24,7 +24,7 @@ public class EventService {
 
     public List<Event> findByUserId(String userId) {
         List<String> deviceIds = deviceRepository.findByUserId(userId).stream().map(Device::getDeviceId).toList();
-        return eventRepository.findByDeviceIdIn(deviceIds);
+        return eventRepository.findByDeviceIdInOrderByTimeDesc(deviceIds);
     }
 
     public boolean save(String userId, Event event) {

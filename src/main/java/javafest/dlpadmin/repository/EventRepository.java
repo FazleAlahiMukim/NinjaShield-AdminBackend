@@ -8,5 +8,5 @@ import javafest.dlpadmin.model.Event;
 
 public interface EventRepository extends MongoRepository<Event, String> {
 
-    List<Event> findByDeviceIdIn(List<String> deviceIds);
+    List<Event> findByDeviceIdInOrderByTimeDesc(List<String> deviceIds);
 }
