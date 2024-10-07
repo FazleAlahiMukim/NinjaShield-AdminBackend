@@ -28,4 +28,8 @@ public class DeviceService {
     public Device save(Device device) {
         return deviceRepository.save(device);
     }
+
+    public void delete(Device device) {
+        deviceRepository.deleteById(device.getDeviceId());
+    }
 }

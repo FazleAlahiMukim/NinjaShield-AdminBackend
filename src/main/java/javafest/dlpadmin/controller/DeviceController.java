@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/api/device")
 public class DeviceController {
     private final DeviceService deviceService;
-    private final AuthService authService;
 
     @GetMapping
     public ResponseEntity<List<Device>> findByUserId(@RequestParam String userId) {
@@ -36,16 +35,6 @@ public class DeviceController {
         return new ResponseEntity<>(deviceService.findByUserId(userId), HttpStatus.OK);
     }
 
-    @GetMapping("/requests")
-    public ResponseEntity<List<Device>> requests(@RequestParam String userId, @RequestParam String email) {
-        String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!authenticatedUserId.equals(userId) || !authService.authenticateUser(userId, email)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        return new ResponseEntity<>(deviceService.findByEmail(email), HttpStatus.OK);
-    }
-
     @PostMapping("/approve")
     public ResponseEntity<Device> approve(@RequestBody Device device) {
         String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -54,6 +43,17 @@ public class DeviceController {
         }
 
         return new ResponseEntity<>(deviceService.save(device), HttpStatus.OK);
+    }
+
+    @PostMapping("/reject")
+    public ResponseEntity<Void> reject(@RequestBody Device device) {
+        String authenticatedUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!authenticatedUserId.equals(device.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        deviceService.delete(device);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/register")

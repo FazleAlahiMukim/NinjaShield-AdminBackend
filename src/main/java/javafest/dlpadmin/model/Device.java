@@ -15,5 +15,5 @@ public class Device {
     private String userId;
     private String email;
     private String name;
-    private int events;
+    private String status;
 }
